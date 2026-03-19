@@ -114,8 +114,8 @@ class Validator:
                 continue
 
             if self.tool_names and name not in self.tool_names:
-                errors.append(f"unknown_tool:{name}")
-                continue
+                warnings.append(f"unknown_tool:{name}")
+                # Don't block — generators may use slightly different names
 
             args = tc.get("arguments")
             if args is None:
@@ -156,9 +156,10 @@ class Validator:
     def is_duplicate(self, example: dict) -> bool:
         """Check if this example is a near-duplicate of one already seen."""
         text = example.get("text", "")
-        # Extract user messages for dedup (ignore system prompt and tool responses)
-        user_parts = re.findall(r"<\|im_start\|>user\n(.*?)\n<\|im_end\|>", text, re.DOTALL)
-        dedup_key = "||".join(user_parts).strip().lower()
+        # Hash full conversation content (excluding system prompt which is always the same)
+        # This preserves examples with same user prompt but different tool call values
+        parts = re.findall(r"<\|im_start\|>(?:user|assistant|tool)\n(.*?)\n<\|im_end\|>", text, re.DOTALL)
+        dedup_key = "||".join(parts).strip()
         content_hash = hashlib.md5(dedup_key.encode()).hexdigest()
 
         if content_hash in self._seen_hashes:

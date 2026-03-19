@@ -23,10 +23,7 @@ DEFAULT_RATIOS = {
     # Synthetic per-domain
     "windows": 0.10,
     "plex": 0.07,
-    "sonarr": 0.05,
-    "radarr": 0.04,
-    "lidarr": 0.03,
-    "prowlarr": 0.02,
+    "arr": 0.14,  # sonarr + radarr + lidarr + prowlarr combined
     "openclaw": 0.07,
     "systemd": 0.06,
     "flipper": 0.05,

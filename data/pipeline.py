@@ -74,10 +74,7 @@ SYNTHETIC_TARGETS = {
     "flipper": 8000,
     "windows": 15000,
     "plex": 12000,
-    "sonarr": 8000,
-    "radarr": 7000,
-    "lidarr": 5000,
-    "prowlarr": 3000,
+    "arr": 23000,  # covers sonarr + radarr + lidarr + prowlarr
     "openclaw": 12000,
     "comfyui": 8000,
     "tts": 6000,
