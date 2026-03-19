@@ -52,7 +52,7 @@ CONVERTER_REGISTRY: dict[str, dict] = {
         "max_examples": None,  # use all
     },
     "hf_xlam": {
-        "class": "data.converters.xlam:XLAMConverter",
+        "class": "data.converters.xlam:XlamConverter",
         "dataset": "Salesforce/xlam-function-calling-60k",
         "max_examples": 20000,
     },
