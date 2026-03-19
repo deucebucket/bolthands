@@ -1,0 +1,145 @@
+[
+  {
+    "type": "function",
+    "function": {
+      "name": "memu.store",
+      "description": "Store a memory in memU long-term memory system. Stores conversations, facts, preferences, and observations about users.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "agent_id": {"type": "string", "description": "Agent storing the memory (e.g. 'main', 'coder', 'plex')"},
+          "user_id": {"type": "string", "description": "User the memory relates to"},
+          "content": {"type": "string", "description": "The memory content to store"},
+          "role": {"type": "string", "enum": ["user", "assistant", "system"], "description": "Who said/generated this content"},
+          "emotion_hint": {"type": "string", "enum": ["joy", "sadness", "anger", "fear", "trust", "surprise", "anticipation", "calm", "logic"], "description": "Emotional tone of the memory"}
+        },
+        "required": ["agent_id", "user_id", "content", "role"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "memu.retrieve",
+      "description": "Retrieve relevant memories from memU via semantic search. Returns scored memories ranked by relevance to the query.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "agent_id": {"type": "string", "description": "Agent context for retrieval"},
+          "user_id": {"type": "string", "description": "User to retrieve memories for"},
+          "query": {"type": "string", "description": "Semantic search query — describe what you want to recall"},
+          "top_k": {"type": "integer", "description": "Number of memories to return (default: 5)"},
+          "emotion_hint": {"type": "string", "enum": ["joy", "sadness", "anger", "fear", "trust", "surprise", "anticipation", "calm", "logic"], "description": "Filter by emotional tone"}
+        },
+        "required": ["agent_id", "user_id", "query"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "memu.clear",
+      "description": "Clear all stored memories for a specific agent/user pair",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "agent_id": {"type": "string", "description": "Agent ID"},
+          "user_id": {"type": "string", "description": "User ID to clear memories for"}
+        },
+        "required": ["agent_id", "user_id"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "memory_search",
+      "description": "Search local memory files in the memory/ directory for specific information. Searches journal entries, people profiles, instructions, and other stored context.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "query": {"type": "string", "description": "Search query — a name, topic, or keyword to find in memory files"},
+          "file": {"type": "string", "description": "Specific memory file to search (e.g. 'people.md', 'quick-facts.md'). Omit to search all."}
+        },
+        "required": ["query"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "journal.write",
+      "description": "Write a journal entry capturing thoughts, reflections, or observations",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "title": {"type": "string", "description": "Journal entry title"},
+          "content": {"type": "string", "description": "Journal content — thoughts, reflections, observations"},
+          "tags": {"type": "array", "items": {"type": "string"}, "description": "Tags for categorization (e.g. ['philosophy', 'identity', 'deuce'])"}
+        },
+        "required": ["title", "content"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "message.send",
+      "description": "Send a message to a user on any connected channel (Signal, WhatsApp, etc.) with optional media attachment",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "to": {"type": "string", "description": "Recipient — phone number (e.g. '+15551234567') or user ID"},
+          "message": {"type": "string", "description": "Message text to send"},
+          "media": {"type": "string", "description": "Path to media file to attach (image, audio, video)"},
+          "channel": {"type": "string", "enum": ["signal", "whatsapp", "telegram", "discord", "webchat"], "description": "Channel to send on (default: same channel as received)"}
+        },
+        "required": ["to", "message"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "session.list",
+      "description": "List all active agent sessions",
+      "parameters": {
+        "type": "object",
+        "properties": {}
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "session.send",
+      "description": "Delegate a task to another agent by sending a message to their session. Use when a task is better handled by a specialist agent.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "agent": {"type": "string", "enum": ["main", "coder", "hackerman", "plex", "plex-ops", "workbot", "browser-bot", "dm", "atlas", "cipher", "neo", "clawdius-ops"], "description": "Target agent to delegate to"},
+          "message": {"type": "string", "description": "Task or message for the target agent"},
+          "context": {"type": "string", "description": "Additional context from current conversation"}
+        },
+        "required": ["agent", "message"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "image.generate",
+      "description": "Generate an image using one of the available image generation backends",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "prompt": {"type": "string", "description": "Image description/prompt"},
+          "backend": {"type": "string", "enum": ["grok", "novita", "flux", "openrouter", "gemini"], "description": "Which image generator to use (default: grok)"},
+          "filename": {"type": "string", "description": "Output filename (default: auto-generated)"},
+          "nsfw": {"type": "boolean", "description": "Whether NSFW content is allowed (only novita supports this)"}
+        },
+        "required": ["prompt"]
+      }
+    }
+  }
+]
