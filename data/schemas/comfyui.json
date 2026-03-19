@@ -1,0 +1,133 @@
+[
+  {
+    "type": "function",
+    "function": {
+      "name": "comfyui.generate_image",
+      "description": "Generate an image using ComfyUI with FLUX or other loaded checkpoint",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "prompt": {"type": "string", "description": "Text prompt describing the image to generate"},
+          "negative_prompt": {"type": "string", "description": "Negative prompt for undesired elements"},
+          "model": {"type": "string", "description": "Checkpoint model name (default: 'flux1-dev')"},
+          "lora": {"type": "string", "description": "LoRA name to apply (e.g., 'celebrity_name', 'style_name')"},
+          "lora_strength": {"type": "number", "description": "LoRA strength (default: 1.0, range: 0.0-2.0)"},
+          "steps": {"type": "integer", "description": "Number of sampling steps (default: 20)"},
+          "cfg": {"type": "number", "description": "CFG scale / guidance (default: 3.5 for FLUX)"},
+          "width": {"type": "integer", "description": "Image width in pixels (default: 1024)"},
+          "height": {"type": "integer", "description": "Image height in pixels (default: 1024)"},
+          "seed": {"type": "integer", "description": "Random seed (-1 for random)"},
+          "sampler": {"type": "string", "enum": ["euler", "euler_ancestral", "dpmpp_2m", "dpmpp_sde", "ddim", "uni_pc"], "description": "Sampler algorithm"},
+          "scheduler": {"type": "string", "enum": ["normal", "karras", "exponential", "sgm_uniform", "simple", "beta"], "description": "Noise scheduler"},
+          "batch_size": {"type": "integer", "description": "Number of images to generate (default: 1)"}
+        },
+        "required": ["prompt"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "comfyui.generate_video",
+      "description": "Generate a video using ComfyUI with Wan2.1 or other video model",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "prompt": {"type": "string", "description": "Text prompt describing the video to generate"},
+          "negative_prompt": {"type": "string", "description": "Negative prompt for undesired elements"},
+          "model": {"type": "string", "description": "Video model name (default: 'wan2.1')"},
+          "lora": {"type": "string", "description": "Video LoRA name to apply"},
+          "lora_strength": {"type": "number", "description": "LoRA strength (default: 1.0)"},
+          "frames": {"type": "integer", "description": "Number of frames to generate (default: 81)"},
+          "fps": {"type": "integer", "description": "Frames per second for output (default: 16)"},
+          "width": {"type": "integer", "description": "Video width in pixels (default: 832)"},
+          "height": {"type": "integer", "description": "Video height in pixels (default: 480)"},
+          "steps": {"type": "integer", "description": "Number of sampling steps (default: 20)"},
+          "cfg": {"type": "number", "description": "CFG scale (default: 6.0)"},
+          "seed": {"type": "integer", "description": "Random seed (-1 for random)"}
+        },
+        "required": ["prompt"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "comfyui.list_models",
+      "description": "List all available checkpoint models in ComfyUI",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "type": {"type": "string", "enum": ["checkpoints", "clip", "vae", "unet", "all"], "description": "Model type to list (default: 'checkpoints')"}
+        }
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "comfyui.list_loras",
+      "description": "List all available LoRA models in ComfyUI",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "filter": {"type": "string", "description": "Filter LoRA names by keyword"},
+          "category": {"type": "string", "enum": ["flux", "wan2.1", "sdxl", "illustrious", "all"], "description": "Filter by model architecture (default: 'all')"}
+        }
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "comfyui.list_workflows",
+      "description": "List all saved ComfyUI workflow files",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "category": {"type": "string", "description": "Filter by workflow category (e.g., 'celebrity', 'style', 'video')"}
+        }
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "comfyui.run_workflow",
+      "description": "Execute a saved ComfyUI workflow by name with optional parameter overrides",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "workflow": {"type": "string", "description": "Workflow filename or name"},
+          "overrides": {"type": "object", "description": "Key-value parameter overrides for the workflow"},
+          "prompt": {"type": "string", "description": "Override the prompt in the workflow"}
+        },
+        "required": ["workflow"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "comfyui.queue_status",
+      "description": "Get the current ComfyUI generation queue status",
+      "parameters": {
+        "type": "object",
+        "properties": {}
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "comfyui.cancel",
+      "description": "Cancel the current generation or a specific queued item",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "prompt_id": {"type": "string", "description": "Specific prompt ID to cancel (omit to cancel current)"}
+        }
+      }
+    }
+  }
+]

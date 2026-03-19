@@ -1,0 +1,77 @@
+[
+  {
+    "type": "function",
+    "function": {
+      "name": "dashboard.service_start",
+      "description": "Start an AI suite service via the dashboard control panel",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "service": {"type": "string", "enum": ["comfyui", "swarmui", "f5tts", "rvc", "gpt-sovits", "llm-chat", "ace-step", "searxng", "mantella", "openclaw"], "description": "Service name to start"}
+        },
+        "required": ["service"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "dashboard.service_stop",
+      "description": "Stop a running AI suite service via the dashboard control panel",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "service": {"type": "string", "enum": ["comfyui", "swarmui", "f5tts", "rvc", "gpt-sovits", "llm-chat", "ace-step", "searxng", "mantella", "openclaw"], "description": "Service name to stop"}
+        },
+        "required": ["service"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "dashboard.service_status",
+      "description": "Get the current status of a specific AI suite service",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "service": {"type": "string", "enum": ["comfyui", "swarmui", "f5tts", "rvc", "gpt-sovits", "llm-chat", "ace-step", "searxng", "mantella", "openclaw"], "description": "Service name to check"}
+        },
+        "required": ["service"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "dashboard.service_list",
+      "description": "List all AI suite services with their current running status",
+      "parameters": {
+        "type": "object",
+        "properties": {}
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "dashboard.gpu_status",
+      "description": "Get GPU utilization, VRAM usage, temperature, and power draw",
+      "parameters": {
+        "type": "object",
+        "properties": {}
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "dashboard.system_status",
+      "description": "Get overall system status including CPU, RAM, disk usage, and uptime",
+      "parameters": {
+        "type": "object",
+        "properties": {}
+      }
+    }
+  }
+]

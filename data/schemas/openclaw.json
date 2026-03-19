@@ -1,0 +1,118 @@
+[
+  {
+    "type": "function",
+    "function": {
+      "name": "openclaw.route",
+      "description": "Route a user request to the most appropriate OpenClaw agent based on the task",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "message": {"type": "string", "description": "The user message to route"},
+          "agent": {"type": "string", "enum": ["coder", "rp", "reason", "hacker", "web", "tool"], "description": "Target agent (auto-detected if omitted)"},
+          "session_id": {"type": "string", "description": "Existing session ID to continue a conversation"}
+        },
+        "required": ["message"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "openclaw.agent_list",
+      "description": "List all available OpenClaw agents with their capabilities and status",
+      "parameters": {
+        "type": "object",
+        "properties": {}
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "openclaw.agent_info",
+      "description": "Get detailed information about a specific OpenClaw agent",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "agent": {"type": "string", "enum": ["coder", "rp", "reason", "hacker", "web", "tool"], "description": "Agent name"}
+        },
+        "required": ["agent"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "openclaw.personality_set",
+      "description": "Set or update the personality profile for an OpenClaw agent",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "agent": {"type": "string", "enum": ["coder", "rp", "reason", "hacker", "web", "tool"], "description": "Agent name"},
+          "personality": {"type": "string", "description": "Personality description or system prompt override"},
+          "tone": {"type": "string", "enum": ["professional", "casual", "friendly", "sarcastic", "concise", "verbose"], "description": "Communication tone"}
+        },
+        "required": ["agent", "personality"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "openclaw.delegate",
+      "description": "Delegate a subtask from one agent to another and return the result",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "from_agent": {"type": "string", "description": "Agent delegating the task"},
+          "to_agent": {"type": "string", "enum": ["coder", "rp", "reason", "hacker", "web", "tool"], "description": "Agent receiving the task"},
+          "task": {"type": "string", "description": "Task description to delegate"},
+          "context": {"type": "string", "description": "Additional context from the delegating agent"}
+        },
+        "required": ["to_agent", "task"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "openclaw.session_list",
+      "description": "List active OpenClaw sessions",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "agent": {"type": "string", "description": "Filter by agent name"},
+          "limit": {"type": "integer", "description": "Max sessions to return (default: 20)"}
+        }
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "openclaw.session_get",
+      "description": "Get conversation history for a specific session",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "session_id": {"type": "string", "description": "Session ID to retrieve"}
+        },
+        "required": ["session_id"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "openclaw.session_end",
+      "description": "End an active OpenClaw session",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "session_id": {"type": "string", "description": "Session ID to end"}
+        },
+        "required": ["session_id"]
+      }
+    }
+  }
+]

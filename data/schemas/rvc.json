@@ -1,0 +1,72 @@
+[
+  {
+    "type": "function",
+    "function": {
+      "name": "rvc.convert_voice",
+      "description": "Convert the voice in an audio file to a different voice using RVC/Applio",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "audio_path": {"type": "string", "description": "Path to the input audio file"},
+          "model": {"type": "string", "description": "RVC model name (e.g., 'jerry')"},
+          "pitch": {"type": "integer", "description": "Pitch shift in semitones (0 = no change, 12 = one octave up, -12 = one octave down)"},
+          "index_rate": {"type": "number", "description": "Feature index ratio for accent strength (0.0-1.0, default: 0.75)"},
+          "filter_radius": {"type": "integer", "description": "Median filter radius for pitch (0-7, default: 3)"},
+          "output_path": {"type": "string", "description": "Output file path for converted audio"},
+          "f0_method": {"type": "string", "enum": ["rmvpe", "crepe", "harvest", "pm"], "description": "Pitch extraction method (default: 'rmvpe')"}
+        },
+        "required": ["audio_path", "model"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "rvc.infer",
+      "description": "Run RVC inference on audio with advanced options",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "audio_path": {"type": "string", "description": "Path to input audio file"},
+          "model": {"type": "string", "description": "RVC model name"},
+          "pitch": {"type": "integer", "description": "Pitch shift in semitones (default: 0)"},
+          "index_rate": {"type": "number", "description": "Feature index ratio (0.0-1.0, default: 0.75)"},
+          "protect": {"type": "number", "description": "Protect voiceless consonants (0.0-0.5, default: 0.33)"},
+          "hop_length": {"type": "integer", "description": "Hop length for pitch extraction (default: 128)"},
+          "output_path": {"type": "string", "description": "Output file path"}
+        },
+        "required": ["audio_path", "model"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "rvc.train_model",
+      "description": "Train a new RVC voice model from a dataset",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "name": {"type": "string", "description": "Model name for the trained voice"},
+          "dataset": {"type": "string", "description": "Path to the training dataset directory"},
+          "epochs": {"type": "integer", "description": "Number of training epochs (default: 100)"},
+          "batch_size": {"type": "integer", "description": "Training batch size (default: 8)"},
+          "sample_rate": {"type": "integer", "enum": [32000, 40000, 48000], "description": "Audio sample rate (default: 40000)"},
+          "save_interval": {"type": "integer", "description": "Save checkpoint every N epochs (default: 10)"}
+        },
+        "required": ["name", "dataset"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "rvc.list_models",
+      "description": "List all available RVC voice models",
+      "parameters": {
+        "type": "object",
+        "properties": {}
+      }
+    }
+  }
+]

@@ -1,0 +1,94 @@
+[
+  {
+    "type": "function",
+    "function": {
+      "name": "llm.swap_model",
+      "description": "Swap the currently loaded LLM model in llama.cpp server",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "model": {"type": "string", "enum": ["coder", "glm", "gemma", "heretic", "mini", "qwen35", "qwen3vl", "all"], "description": "Model preset name to load"}
+        },
+        "required": ["model"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "llm.server_status",
+      "description": "Get the current status of the llama.cpp LLM server including loaded model and memory usage",
+      "parameters": {
+        "type": "object",
+        "properties": {}
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "llm.list_models",
+      "description": "List all available LLM model files in the models directory",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "format": {"type": "string", "enum": ["gguf", "all"], "description": "Filter by model format (default: 'gguf')"}
+        }
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "llm.load_lora",
+      "description": "Load a LoRA adapter onto the currently running LLM",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "path": {"type": "string", "description": "Path to the LoRA adapter file"},
+          "scale": {"type": "number", "description": "LoRA scaling factor (default: 1.0)"}
+        },
+        "required": ["path"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "llm.unload_lora",
+      "description": "Unload the currently active LoRA adapter from the LLM",
+      "parameters": {
+        "type": "object",
+        "properties": {}
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "llm.list_loras",
+      "description": "List all available LoRA adapter files for the LLM",
+      "parameters": {
+        "type": "object",
+        "properties": {}
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "llm.chat",
+      "description": "Send a test chat message to the running LLM server and return the response",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "message": {"type": "string", "description": "User message to send"},
+          "system_prompt": {"type": "string", "description": "Optional system prompt override"},
+          "temperature": {"type": "number", "description": "Sampling temperature (default: 0.7)"},
+          "max_tokens": {"type": "integer", "description": "Maximum tokens to generate (default: 512)"}
+        },
+        "required": ["message"]
+      }
+    }
+  }
+]

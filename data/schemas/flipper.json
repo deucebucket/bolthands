@@ -1,0 +1,263 @@
+[
+  {
+    "type": "function",
+    "function": {
+      "name": "flipper.badusb_deploy",
+      "description": "Deploy a BadUSB payload script to the Flipper Zero and optionally execute it",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "payload": {"type": "string", "description": "DuckyScript payload content"},
+          "filename": {"type": "string", "description": "Filename to save on Flipper (e.g., 'rickroll.txt')"},
+          "execute": {"type": "boolean", "description": "Execute the payload immediately after deploy (default: false)"}
+        },
+        "required": ["payload", "filename"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "flipper.badusb_list",
+      "description": "List all BadUSB payload scripts stored on the Flipper Zero",
+      "parameters": {
+        "type": "object",
+        "properties": {}
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "flipper.ir_transmit",
+      "description": "Transmit an infrared signal from the Flipper Zero",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "remote": {"type": "string", "description": "Remote file name (e.g., 'TV_Samsung.ir')"},
+          "signal": {"type": "string", "description": "Signal name within the remote file (e.g., 'Power', 'Vol_up')"}
+        },
+        "required": ["remote", "signal"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "flipper.ir_record",
+      "description": "Record a new infrared signal using the Flipper Zero receiver",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "remote": {"type": "string", "description": "Remote file name to save to"},
+          "signal_name": {"type": "string", "description": "Name for the recorded signal"},
+          "timeout": {"type": "integer", "description": "Recording timeout in seconds (default: 10)"}
+        },
+        "required": ["remote", "signal_name"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "flipper.ir_list",
+      "description": "List all infrared remote files and their signals on the Flipper Zero",
+      "parameters": {
+        "type": "object",
+        "properties": {}
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "flipper.nfc_read",
+      "description": "Read an NFC tag using the Flipper Zero",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "save_as": {"type": "string", "description": "Filename to save the read tag data"},
+          "timeout": {"type": "integer", "description": "Read timeout in seconds (default: 10)"}
+        }
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "flipper.nfc_emulate",
+      "description": "Emulate a saved NFC tag from the Flipper Zero",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "filename": {"type": "string", "description": "NFC file to emulate (e.g., 'badge.nfc')"},
+          "duration": {"type": "integer", "description": "Emulation duration in seconds (default: 30)"}
+        },
+        "required": ["filename"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "flipper.nfc_list",
+      "description": "List all saved NFC tags on the Flipper Zero",
+      "parameters": {
+        "type": "object",
+        "properties": {}
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "flipper.subghz_transmit",
+      "description": "Transmit a saved Sub-GHz signal from the Flipper Zero",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "filename": {"type": "string", "description": "Sub-GHz file to transmit (e.g., 'garage.sub')"},
+          "repeat": {"type": "integer", "description": "Number of times to repeat transmission (default: 1)"}
+        },
+        "required": ["filename"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "flipper.subghz_receive",
+      "description": "Receive and record Sub-GHz signals using the Flipper Zero",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "frequency": {"type": "integer", "description": "Frequency in Hz (e.g., 433920000 for 433.92 MHz)"},
+          "save_as": {"type": "string", "description": "Filename to save captured signal"},
+          "timeout": {"type": "integer", "description": "Capture timeout in seconds (default: 30)"}
+        },
+        "required": ["frequency"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "flipper.subghz_list",
+      "description": "List all saved Sub-GHz signal files on the Flipper Zero",
+      "parameters": {
+        "type": "object",
+        "properties": {}
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "flipper.amiibo_list",
+      "description": "List all Amiibo files stored on the Flipper Zero",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "folder": {"type": "string", "description": "Subfolder to list (default: root amiibo directory)"}
+        }
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "flipper.amiibo_emulate",
+      "description": "Emulate an Amiibo NFC tag from the Flipper Zero",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "filename": {"type": "string", "description": "Amiibo file path to emulate"},
+          "duration": {"type": "integer", "description": "Emulation duration in seconds (default: 30)"}
+        },
+        "required": ["filename"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "flipper.gpio_read",
+      "description": "Read the state of a GPIO pin on the Flipper Zero",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "pin": {"type": "string", "enum": ["PA7", "PA6", "PA4", "PB3", "PB2", "PC3", "PC1", "PC0"], "description": "GPIO pin identifier"}
+        },
+        "required": ["pin"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "flipper.gpio_write",
+      "description": "Set the output state of a GPIO pin on the Flipper Zero",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "pin": {"type": "string", "enum": ["PA7", "PA6", "PA4", "PB3", "PB2", "PC3", "PC1", "PC0"], "description": "GPIO pin identifier"},
+          "state": {"type": "boolean", "description": "Pin state: true for HIGH, false for LOW"}
+        },
+        "required": ["pin", "state"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "flipper.gpio_set_mode",
+      "description": "Set the mode of a GPIO pin on the Flipper Zero",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "pin": {"type": "string", "enum": ["PA7", "PA6", "PA4", "PB3", "PB2", "PC3", "PC1", "PC0"], "description": "GPIO pin identifier"},
+          "mode": {"type": "string", "enum": ["input", "output", "analog", "input_pullup", "input_pulldown"], "description": "Pin mode"}
+        },
+        "required": ["pin", "mode"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "flipper.device_info",
+      "description": "Get Flipper Zero device information including firmware version, battery, and storage",
+      "parameters": {
+        "type": "object",
+        "properties": {}
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "flipper.device_reboot",
+      "description": "Reboot the Flipper Zero device",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "mode": {"type": "string", "enum": ["normal", "dfu", "update"], "description": "Reboot mode (default: 'normal')"}
+        }
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "flipper.device_update",
+      "description": "Update the Flipper Zero firmware",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "firmware": {"type": "string", "description": "Firmware file path or 'latest' for latest Momentum release"},
+          "channel": {"type": "string", "enum": ["release", "dev"], "description": "Firmware channel (default: 'release')"}
+        }
+      }
+    }
+  }
+]

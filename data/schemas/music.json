@@ -1,0 +1,32 @@
+[
+  {
+    "type": "function",
+    "function": {
+      "name": "music.generate",
+      "description": "Generate music using ACE-Step AI music generation",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "prompt": {"type": "string", "description": "Text prompt describing the music to generate (lyrics, mood, instruments)"},
+          "style": {"type": "string", "description": "Musical style or genre (e.g., 'rock', 'jazz', 'electronic', 'orchestral', 'lo-fi hip hop')"},
+          "duration": {"type": "integer", "description": "Duration in seconds (default: 30, max: 300)"},
+          "tempo": {"type": "integer", "description": "Tempo in BPM (default: auto-detected from style)"},
+          "seed": {"type": "integer", "description": "Random seed for reproducibility (-1 for random)"},
+          "output_path": {"type": "string", "description": "Output file path for generated audio"}
+        },
+        "required": ["prompt"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "music.list_styles",
+      "description": "List all available music generation styles and genres supported by ACE-Step",
+      "parameters": {
+        "type": "object",
+        "properties": {}
+      }
+    }
+  }
+]
