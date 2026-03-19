@@ -1,0 +1,94 @@
+[
+  {
+    "type": "function",
+    "function": {
+      "name": "tts.synthesize",
+      "description": "Synthesize speech from text using GPT-SoVITS voice cloning TTS",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "text": {"type": "string", "description": "Text to synthesize into speech"},
+          "voice": {"type": "string", "description": "Voice model name (e.g., 'jerry3')"},
+          "ref_audio": {"type": "string", "description": "Path to reference audio for voice cloning"},
+          "ref_text": {"type": "string", "description": "Transcript of the reference audio"},
+          "language": {"type": "string", "enum": ["en", "zh", "ja", "auto"], "description": "Language of the text (default: 'auto')"},
+          "speed": {"type": "number", "description": "Speech speed multiplier (default: 1.0)"},
+          "output_path": {"type": "string", "description": "Output file path for the generated audio"}
+        },
+        "required": ["text"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "tts.list_voices",
+      "description": "List all available GPT-SoVITS voice models",
+      "parameters": {
+        "type": "object",
+        "properties": {}
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "tts.set_voice",
+      "description": "Set the active voice model for GPT-SoVITS synthesis",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "voice": {"type": "string", "description": "Voice model name to activate"},
+          "sovits_path": {"type": "string", "description": "Path to SoVITS weights file"},
+          "gpt_path": {"type": "string", "description": "Path to GPT weights file"}
+        },
+        "required": ["voice"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "f5tts.synthesize",
+      "description": "Synthesize speech from text using F5-TTS with voice cloning from a reference sample",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "text": {"type": "string", "description": "Text to synthesize into speech"},
+          "ref_audio": {"type": "string", "description": "Path to reference audio for voice cloning"},
+          "ref_text": {"type": "string", "description": "Transcript of the reference audio"},
+          "speed": {"type": "number", "description": "Speech speed multiplier (default: 1.0)"},
+          "output_path": {"type": "string", "description": "Output file path for the generated audio"}
+        },
+        "required": ["text", "ref_audio"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "f5tts.clone_voice",
+      "description": "Create a reusable voice profile from a reference audio sample in F5-TTS",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "name": {"type": "string", "description": "Name for the voice profile"},
+          "ref_audio": {"type": "string", "description": "Path to reference audio file (5-15 seconds recommended)"},
+          "ref_text": {"type": "string", "description": "Transcript of the reference audio"}
+        },
+        "required": ["name", "ref_audio", "ref_text"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "f5tts.list_voices",
+      "description": "List all available F5-TTS voice profiles",
+      "parameters": {
+        "type": "object",
+        "properties": {}
+      }
+    }
+  }
+]

@@ -1,0 +1,152 @@
+[
+  {
+    "type": "function",
+    "function": {
+      "name": "plex.library_scan",
+      "description": "Scan a Plex library section for new media",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "section": {"type": "string", "description": "Library section name (e.g., 'Movies', 'TV Shows', 'Music')"},
+          "path": {"type": "string", "description": "Optional specific path to scan"}
+        },
+        "required": ["section"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "plex.library_list",
+      "description": "List all items in a Plex library section with optional filtering",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "section": {"type": "string", "description": "Library section name"},
+          "filter": {"type": "string", "description": "Optional search/filter query"},
+          "sort": {"type": "string", "description": "Sort field: titleSort, addedAt, rating, year"},
+          "limit": {"type": "integer", "description": "Max results (default: 50)"}
+        },
+        "required": ["section"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "plex.now_playing",
+      "description": "Get all active playback sessions on the Plex server",
+      "parameters": {
+        "type": "object",
+        "properties": {}
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "plex.recently_added",
+      "description": "Get recently added media items",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "section": {"type": "string", "description": "Library section name (omit for all sections)"},
+          "limit": {"type": "integer", "description": "Max results (default: 20)"}
+        }
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "plex.search",
+      "description": "Search across all Plex libraries",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "query": {"type": "string", "description": "Search query"},
+          "media_type": {"type": "string", "enum": ["movie", "show", "episode", "artist", "album", "track"], "description": "Optional media type filter"}
+        },
+        "required": ["query"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "plex.collection_manage",
+      "description": "Manage Plex collections",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "action": {"type": "string", "enum": ["list", "create", "add_items", "remove_items", "delete"], "description": "Collection operation"},
+          "section": {"type": "string", "description": "Library section name"},
+          "name": {"type": "string", "description": "Collection name"},
+          "items": {"type": "array", "items": {"type": "string"}, "description": "Item titles to add/remove"}
+        },
+        "required": ["action", "section"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "plex.playlist_manage",
+      "description": "Manage Plex playlists",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "action": {"type": "string", "enum": ["list", "create", "add_items", "remove_items", "delete"], "description": "Playlist operation"},
+          "name": {"type": "string", "description": "Playlist name"},
+          "items": {"type": "array", "items": {"type": "string"}, "description": "Item titles to add/remove"},
+          "section": {"type": "string", "description": "Library section (required for create)"}
+        },
+        "required": ["action"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "plex.user_manage",
+      "description": "Manage Plex users and sharing",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "action": {"type": "string", "enum": ["list", "get_activity", "check_who_watching"], "description": "User management action"},
+          "username": {"type": "string", "description": "Optional username filter"}
+        },
+        "required": ["action"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "plex.maintenance",
+      "description": "Run Plex server maintenance tasks",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "task": {"type": "string", "enum": ["empty_trash", "clean_bundles", "optimize_db", "refresh_metadata", "check_update", "install_update", "butler_tasks"], "description": "Maintenance task to run"},
+          "section": {"type": "string", "description": "Library section (for section-specific tasks)"}
+        },
+        "required": ["task"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "plex.server_status",
+      "description": "Get Plex server status: health, transcode sessions, bandwidth, connected clients",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "detail": {"type": "string", "enum": ["overview", "transcodes", "bandwidth", "clients", "history"], "description": "Status detail level"}
+        },
+        "required": ["detail"]
+      }
+    }
+  }
+]

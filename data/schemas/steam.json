@@ -1,0 +1,78 @@
+[
+  {
+    "type": "function",
+    "function": {
+      "name": "steam.list_games",
+      "description": "List all installed Steam games with their app IDs and install sizes",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "filter": {"type": "string", "description": "Optional filter by game name"},
+          "installed_only": {"type": "boolean", "description": "Only show installed games (default: true)"}
+        }
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "steam.game_info",
+      "description": "Get detailed information about a specific Steam game",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "appid": {"type": "integer", "description": "Steam application ID"},
+          "include_mods": {"type": "boolean", "description": "Include installed mod information (default: false)"}
+        },
+        "required": ["appid"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "steam.set_launch_options",
+      "description": "Set Steam launch options for a game (Steam must be closed first)",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "appid": {"type": "integer", "description": "Steam application ID"},
+          "options": {"type": "string", "description": "Launch options string (e.g., 'MANGOHUD=1 %command%', 'PROTON_USE_WINED3D=1 %command%')"}
+        },
+        "required": ["appid", "options"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "steam.list_mods",
+      "description": "List installed mods for a Steam game by scanning its data directory",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "appid": {"type": "integer", "description": "Steam application ID"},
+          "mod_type": {"type": "string", "enum": ["all", "plugins", "scripts", "reshade", "enb", "textures"], "description": "Filter by mod type (default: 'all')"}
+        },
+        "required": ["appid"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "steam.install_mod",
+      "description": "Download and install a mod for a Steam game from Nexus Mods or a direct URL",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "appid": {"type": "integer", "description": "Steam application ID"},
+          "mod_url": {"type": "string", "description": "Nexus Mods URL or direct download URL for the mod"},
+          "install_path": {"type": "string", "description": "Override install path within the game directory"},
+          "backup": {"type": "boolean", "description": "Backup existing files before overwriting (default: true)"}
+        },
+        "required": ["appid", "mod_url"]
+      }
+    }
+  }
+]

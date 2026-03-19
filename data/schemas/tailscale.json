@@ -1,0 +1,56 @@
+[
+  {
+    "type": "function",
+    "function": {
+      "name": "tailscale.status",
+      "description": "Get the current Tailscale network status including connection state and IP addresses",
+      "parameters": {
+        "type": "object",
+        "properties": {}
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "tailscale.list_devices",
+      "description": "List all devices on the Tailscale network with their hostnames, IPs, and online status",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "online_only": {"type": "boolean", "description": "Only show currently online devices (default: false)"}
+        }
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "tailscale.ping",
+      "description": "Ping a device on the Tailscale network to check connectivity and latency",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "hostname": {"type": "string", "description": "Tailscale hostname or IP to ping"},
+          "count": {"type": "integer", "description": "Number of pings to send (default: 4)"}
+        },
+        "required": ["hostname"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "tailscale.send_file",
+      "description": "Send a file to another device on the Tailscale network using Taildrop",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "hostname": {"type": "string", "description": "Tailscale hostname or IP of the target device"},
+          "path": {"type": "string", "description": "Local file path to send"}
+        },
+        "required": ["hostname", "path"]
+      }
+    }
+  }
+]

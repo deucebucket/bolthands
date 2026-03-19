@@ -1,0 +1,47 @@
+# BoltHands 9B — Unsloth CLI Training Configuration
+# Fine-tune Qwen 3.5 9B for multi-domain tool calling
+#
+# Usage:
+#   unsloth train -c config.yaml --local-dataset /path/to/data.jsonl
+#   unsloth train -c config.yaml --local-dataset /path/to/data.jsonl --dry-run
+
+model: "unsloth/Qwen3.5-9B"
+
+data:
+  # Dataset path set at runtime via CLI override:
+  #   --local-dataset /path/to/bolthands_train.jsonl
+  format_type: "chatml"
+
+training:
+  training_type: "lora"
+  max_seq_length: 4096
+  load_in_4bit: true
+  output_dir: "~/ai-drive/bolthands/checkpoints"
+  num_epochs: 3
+  learning_rate: 0.0002
+  batch_size: 2
+  gradient_accumulation_steps: 8    # Effective batch size = 16
+  warmup_steps: 100
+  max_steps: 0                      # 0 = use num_epochs
+  save_steps: 500
+  weight_decay: 0.01
+  random_seed: 42
+  packing: false
+  train_on_completions: false
+  gradient_checkpointing: "unsloth" # 70% less VRAM
+
+lora:
+  lora_r: 64                        # Higher rank for multi-domain knowledge
+  lora_alpha: 128                   # Alpha = 2x rank
+  lora_dropout: 0.05
+  target_modules: "q_proj,k_proj,v_proj,o_proj,gate_proj,up_proj,down_proj"
+  use_rslora: true                  # Rank-Stabilized LoRA
+  use_loftq: false
+  finetune_language_layers: true
+  finetune_attention_modules: true
+  finetune_mlp_modules: true
+
+logging:
+  enable_wandb: false
+  enable_tensorboard: true
+  tensorboard_dir: "~/ai-drive/bolthands/runs"

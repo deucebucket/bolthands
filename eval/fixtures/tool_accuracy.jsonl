@@ -1,0 +1,10 @@
+{"prompt": "Run ipconfig on the Windows PC at 192.168.1.100", "expected_tools": ["win.powershell"], "domain": "windows", "difficulty": "easy"}
+{"prompt": "Check if the Windows Update service is running on DESKTOP-HOME", "expected_tools": ["win.service_manage"], "domain": "windows", "difficulty": "easy"}
+{"prompt": "Check for any available Windows updates on 192.168.1.100", "expected_tools": ["win.update_check"], "domain": "windows", "difficulty": "easy"}
+{"prompt": "Look up the registry value for the Windows wallpaper path on DESKTOP-HOME", "expected_tools": ["win.registry"], "domain": "windows", "difficulty": "medium"}
+{"prompt": "Show me all critical errors in the Windows System event log from the last 6 hours on 192.168.1.100", "expected_tools": ["win.event_log"], "domain": "windows", "difficulty": "medium"}
+{"prompt": "Create a scheduled task on DESKTOP-HOME to run disk cleanup daily at 3am", "expected_tools": ["win.scheduled_task"], "domain": "windows", "difficulty": "hard"}
+{"prompt": "Search the web for the latest RTX 5090 benchmarks", "expected_tools": ["web_search"], "domain": "core", "difficulty": "easy"}
+{"prompt": "Read the contents of /etc/hostname on this machine", "expected_tools": ["file_read"], "domain": "core", "difficulty": "easy"}
+{"prompt": "Run df -h to check disk usage on this system", "expected_tools": ["bash"], "domain": "core", "difficulty": "easy"}
+{"prompt": "Fetch the content from https://example.com and extract the main heading", "expected_tools": ["web_fetch"], "domain": "core", "difficulty": "medium"}

@@ -1,0 +1,160 @@
+[
+  {
+    "type": "function",
+    "function": {
+      "name": "systemd.start",
+      "description": "Start a systemd unit",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "unit": {"type": "string", "description": "Unit name (e.g., 'nginx.service', 'sshd.service')"},
+          "user": {"type": "boolean", "description": "Target user units instead of system units (default: false)"}
+        },
+        "required": ["unit"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "systemd.stop",
+      "description": "Stop a systemd unit",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "unit": {"type": "string", "description": "Unit name"},
+          "user": {"type": "boolean", "description": "Target user units instead of system units (default: false)"}
+        },
+        "required": ["unit"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "systemd.restart",
+      "description": "Restart a systemd unit",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "unit": {"type": "string", "description": "Unit name"},
+          "user": {"type": "boolean", "description": "Target user units instead of system units (default: false)"}
+        },
+        "required": ["unit"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "systemd.enable",
+      "description": "Enable a systemd unit to start on boot",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "unit": {"type": "string", "description": "Unit name"},
+          "user": {"type": "boolean", "description": "Target user units instead of system units (default: false)"},
+          "now": {"type": "boolean", "description": "Also start the unit immediately (default: false)"}
+        },
+        "required": ["unit"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "systemd.disable",
+      "description": "Disable a systemd unit from starting on boot",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "unit": {"type": "string", "description": "Unit name"},
+          "user": {"type": "boolean", "description": "Target user units instead of system units (default: false)"},
+          "now": {"type": "boolean", "description": "Also stop the unit immediately (default: false)"}
+        },
+        "required": ["unit"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "systemd.status",
+      "description": "Get the status of a systemd unit including active state, PID, and recent logs",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "unit": {"type": "string", "description": "Unit name"},
+          "user": {"type": "boolean", "description": "Target user units instead of system units (default: false)"}
+        },
+        "required": ["unit"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "systemd.list",
+      "description": "List systemd units with optional filtering",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "type": {"type": "string", "enum": ["service", "timer", "socket", "mount", "target", "all"], "description": "Unit type to list (default: 'service')"},
+          "state": {"type": "string", "enum": ["active", "inactive", "failed", "running", "all"], "description": "Filter by state (default: 'all')"},
+          "user": {"type": "boolean", "description": "List user units instead of system units (default: false)"},
+          "pattern": {"type": "string", "description": "Glob pattern to filter unit names"}
+        }
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "systemd.journal",
+      "description": "Query the systemd journal for log entries",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "unit": {"type": "string", "description": "Filter by unit name"},
+          "priority": {"type": "string", "enum": ["emerg", "alert", "crit", "err", "warning", "notice", "info", "debug"], "description": "Minimum log priority"},
+          "since": {"type": "string", "description": "Show entries since this time (e.g., '1 hour ago', '2024-01-01', 'today')"},
+          "until": {"type": "string", "description": "Show entries until this time"},
+          "lines": {"type": "integer", "description": "Number of recent lines to show (default: 50)"},
+          "user": {"type": "boolean", "description": "Query user journal (default: false)"},
+          "grep": {"type": "string", "description": "Filter log lines by regex pattern"}
+        }
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "systemd.timer_list",
+      "description": "List all systemd timers with next/last trigger times",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "user": {"type": "boolean", "description": "List user timers instead of system timers (default: false)"}
+        }
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "systemd.timer_create",
+      "description": "Create a new systemd timer and associated service unit",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "name": {"type": "string", "description": "Timer/service name (without .timer/.service suffix)"},
+          "command": {"type": "string", "description": "Command to execute when timer fires"},
+          "schedule": {"type": "string", "description": "OnCalendar schedule (e.g., 'daily', '*-*-* 02:00:00', 'hourly')"},
+          "user": {"type": "boolean", "description": "Create as user unit instead of system unit (default: false)"},
+          "description": {"type": "string", "description": "Human-readable description of the timer"}
+        },
+        "required": ["name", "command", "schedule"]
+      }
+    }
+  }
+]

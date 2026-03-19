@@ -1,0 +1,94 @@
+[
+  {
+    "type": "function",
+    "function": {
+      "name": "bash",
+      "description": "Execute a bash command on the local system (Carl / Raspberry Pi)",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "command": {"type": "string", "description": "The bash command to execute"},
+          "timeout": {"type": "integer", "description": "Timeout in seconds (default: 30)"}
+        },
+        "required": ["command"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "file_read",
+      "description": "Read contents of a file on the local system",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "path": {"type": "string", "description": "Absolute file path"},
+          "lines": {"type": "integer", "description": "Max lines to read (default: all)"}
+        },
+        "required": ["path"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "file_write",
+      "description": "Write content to a file on the local system",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "path": {"type": "string", "description": "Absolute file path"},
+          "content": {"type": "string", "description": "Content to write"},
+          "append": {"type": "boolean", "description": "Append instead of overwrite (default: false)"}
+        },
+        "required": ["path", "content"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "web_search",
+      "description": "Search the web using SearXNG metasearch engine",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "query": {"type": "string", "description": "Search query"},
+          "num_results": {"type": "integer", "description": "Number of results (default: 5)"}
+        },
+        "required": ["query"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "web_fetch",
+      "description": "Fetch and extract content from a URL",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "url": {"type": "string", "description": "URL to fetch"},
+          "selector": {"type": "string", "description": "Optional CSS selector to extract specific content"}
+        },
+        "required": ["url"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "save_research",
+      "description": "Save research findings to a markdown file",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "topic": {"type": "string", "description": "Research topic (used as filename)"},
+          "content": {"type": "string", "description": "Markdown content to save"},
+          "directory": {"type": "string", "description": "Directory to save in (default: ~/research/)"}
+        },
+        "required": ["topic", "content"]
+      }
+    }
+  }
+]

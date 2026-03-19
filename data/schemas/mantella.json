@@ -1,0 +1,74 @@
+[
+  {
+    "type": "function",
+    "function": {
+      "name": "mantella.server_start",
+      "description": "Start the Mantella AI NPC server for Fallout 4",
+      "parameters": {
+        "type": "object",
+        "properties": {}
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "mantella.server_stop",
+      "description": "Stop the running Mantella AI NPC server",
+      "parameters": {
+        "type": "object",
+        "properties": {}
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "mantella.server_status",
+      "description": "Get the current status of the Mantella server including connected game and active NPCs",
+      "parameters": {
+        "type": "object",
+        "properties": {}
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "mantella.set_config",
+      "description": "Set a configuration value in the Mantella config file",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "key": {"type": "string", "description": "Configuration key (e.g., 'llm_api', 'tts_service', 'language', 'max_response_sentences')"},
+          "value": {"type": "string", "description": "Value to set"}
+        },
+        "required": ["key", "value"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "mantella.get_config",
+      "description": "Get current Mantella configuration values",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "key": {"type": "string", "description": "Specific config key to retrieve (omit for all settings)"}
+        }
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "mantella.reload",
+      "description": "Reload the Mantella server configuration without full restart",
+      "parameters": {
+        "type": "object",
+        "properties": {}
+      }
+    }
+  }
+]

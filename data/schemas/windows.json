@@ -1,0 +1,157 @@
+[
+  {
+    "type": "function",
+    "function": {
+      "name": "win.powershell",
+      "description": "Execute a PowerShell command on a remote Windows machine via WinRM",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "host": {"type": "string", "description": "Windows hostname or IP address"},
+          "command": {"type": "string", "description": "PowerShell command or script block to execute"},
+          "as_admin": {"type": "boolean", "description": "Run with elevated privileges (default: false)"}
+        },
+        "required": ["host", "command"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "win.service_manage",
+      "description": "Manage a Windows service (start, stop, restart, status, set startup type)",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "host": {"type": "string", "description": "Windows hostname or IP"},
+          "service": {"type": "string", "description": "Service name"},
+          "action": {"type": "string", "enum": ["start", "stop", "restart", "status", "set_auto", "set_manual", "set_disabled"], "description": "Action to perform"}
+        },
+        "required": ["host", "service", "action"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "win.update_check",
+      "description": "Check for and optionally install Windows Updates on a remote machine",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "host": {"type": "string", "description": "Windows hostname or IP"},
+          "action": {"type": "string", "enum": ["check", "install", "history"], "description": "Check for updates, install all, or view history"},
+          "reboot": {"type": "boolean", "description": "Allow automatic reboot after install (default: false)"}
+        },
+        "required": ["host", "action"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "win.registry",
+      "description": "Read or write Windows registry values on a remote machine",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "host": {"type": "string", "description": "Windows hostname or IP"},
+          "action": {"type": "string", "enum": ["get", "set", "delete", "list"], "description": "Registry operation"},
+          "path": {"type": "string", "description": "Registry path (e.g., HKLM:\\SOFTWARE\\Microsoft)"},
+          "name": {"type": "string", "description": "Value name (for get/set/delete)"},
+          "value": {"type": "string", "description": "Value to set (for set action)"},
+          "type": {"type": "string", "enum": ["String", "DWord", "QWord", "Binary", "MultiString", "ExpandString"], "description": "Registry value type (for set)"}
+        },
+        "required": ["host", "action", "path"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "win.scheduled_task",
+      "description": "Manage Windows Task Scheduler on a remote machine",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "host": {"type": "string", "description": "Windows hostname or IP"},
+          "action": {"type": "string", "enum": ["list", "get", "create", "enable", "disable", "run", "delete"], "description": "Task action"},
+          "name": {"type": "string", "description": "Task name"},
+          "command": {"type": "string", "description": "Command to execute (for create)"},
+          "schedule": {"type": "string", "description": "Cron-like schedule: 'daily@02:00', 'weekly@mon@09:00', 'hourly'"}
+        },
+        "required": ["host", "action"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "win.event_log",
+      "description": "Query Windows Event Logs on a remote machine",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "host": {"type": "string", "description": "Windows hostname or IP"},
+          "log": {"type": "string", "description": "Log name: System, Application, Security, Setup"},
+          "level": {"type": "string", "enum": ["critical", "error", "warning", "info", "all"], "description": "Minimum severity level"},
+          "max_events": {"type": "integer", "description": "Maximum events to return (default: 20)"},
+          "hours_back": {"type": "integer", "description": "Only events from last N hours (default: 24)"}
+        },
+        "required": ["host", "log"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "win.file_manage",
+      "description": "Remote file operations on a Windows machine",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "host": {"type": "string", "description": "Windows hostname or IP"},
+          "action": {"type": "string", "enum": ["list", "read", "write", "copy", "move", "delete", "exists", "size"], "description": "File operation"},
+          "path": {"type": "string", "description": "File or directory path"},
+          "destination": {"type": "string", "description": "Destination path (for copy/move)"},
+          "content": {"type": "string", "description": "Content to write (for write)"},
+          "recursive": {"type": "boolean", "description": "Recursive operation (default: false)"}
+        },
+        "required": ["host", "action", "path"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "win.user_manage",
+      "description": "Manage local users and groups on a Windows machine",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "host": {"type": "string", "description": "Windows hostname or IP"},
+          "action": {"type": "string", "enum": ["list_users", "list_groups", "add_user", "remove_user", "disable_user", "enable_user", "add_to_group", "remove_from_group", "reset_password"], "description": "User management action"},
+          "username": {"type": "string", "description": "Username"},
+          "group": {"type": "string", "description": "Group name"},
+          "password": {"type": "string", "description": "Password (for add_user/reset_password)"}
+        },
+        "required": ["host", "action"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "win.system_info",
+      "description": "Get system information from a remote Windows machine",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "host": {"type": "string", "description": "Windows hostname or IP"},
+          "category": {"type": "string", "enum": ["overview", "cpu", "memory", "disk", "network", "processes", "uptime"], "description": "Information category"}
+        },
+        "required": ["host", "category"]
+      }
+    }
+  }
+]

@@ -1,0 +1,305 @@
+[
+  {
+    "type": "function",
+    "function": {
+      "name": "sonarr.series_list",
+      "description": "List all TV series in Sonarr",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "filter": {"type": "string", "description": "Optional title filter"}
+        }
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "sonarr.series_add",
+      "description": "Add a new TV series to Sonarr for monitoring and downloading",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "title": {"type": "string", "description": "Series title to search for"},
+          "quality_profile": {"type": "string", "description": "Quality profile name (default: 'HD-1080p')"},
+          "root_folder": {"type": "string", "description": "Root folder path for the series"},
+          "monitor": {"type": "string", "enum": ["all", "future", "missing", "existing", "firstSeason", "latestSeason", "none"], "description": "Monitoring strategy (default: 'all')"},
+          "search_now": {"type": "boolean", "description": "Immediately search for existing episodes (default: true)"}
+        },
+        "required": ["title"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "sonarr.series_search",
+      "description": "Trigger a search for missing/wanted episodes of a series",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "title": {"type": "string", "description": "Series title"},
+          "season": {"type": "integer", "description": "Optional specific season number"},
+          "episode": {"type": "integer", "description": "Optional specific episode number"}
+        },
+        "required": ["title"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "sonarr.wanted",
+      "description": "List missing or cutoff-unmet episodes",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "type": {"type": "string", "enum": ["missing", "cutoff"], "description": "Wanted type"},
+          "limit": {"type": "integer", "description": "Max results (default: 20)"}
+        },
+        "required": ["type"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "sonarr.calendar",
+      "description": "Get upcoming episode air dates",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "days_ahead": {"type": "integer", "description": "Number of days to look ahead (default: 7)"},
+          "days_back": {"type": "integer", "description": "Number of days to look back (default: 0)"}
+        }
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "sonarr.queue",
+      "description": "Get current download queue status",
+      "parameters": {
+        "type": "object",
+        "properties": {}
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "sonarr.health",
+      "description": "Check Sonarr system health and disk space",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "include_disk": {"type": "boolean", "description": "Include disk space info (default: true)"}
+        }
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "radarr.movie_list",
+      "description": "List all movies in Radarr",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "filter": {"type": "string", "description": "Optional title filter"},
+          "status": {"type": "string", "enum": ["all", "monitored", "unmonitored", "missing", "downloaded"], "description": "Filter by status"}
+        }
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "radarr.movie_add",
+      "description": "Add a new movie to Radarr for monitoring and downloading",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "title": {"type": "string", "description": "Movie title to search for"},
+          "quality_profile": {"type": "string", "description": "Quality profile name (default: 'HD-1080p')"},
+          "root_folder": {"type": "string", "description": "Root folder path for the movie"},
+          "search_now": {"type": "boolean", "description": "Immediately search for the movie (default: true)"}
+        },
+        "required": ["title"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "radarr.movie_search",
+      "description": "Trigger a search for a specific movie",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "title": {"type": "string", "description": "Movie title to search for"}
+        },
+        "required": ["title"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "radarr.queue",
+      "description": "Get current download queue status",
+      "parameters": {
+        "type": "object",
+        "properties": {}
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "radarr.health",
+      "description": "Check Radarr system health and disk space",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "include_disk": {"type": "boolean", "description": "Include disk space info (default: true)"}
+        }
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "lidarr.artist_list",
+      "description": "List all artists in Lidarr",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "filter": {"type": "string", "description": "Optional name filter"}
+        }
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "lidarr.artist_add",
+      "description": "Add a new artist to Lidarr for monitoring",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "name": {"type": "string", "description": "Artist name to search for"},
+          "quality_profile": {"type": "string", "description": "Quality profile name"},
+          "root_folder": {"type": "string", "description": "Root folder path"},
+          "monitor": {"type": "string", "enum": ["all", "future", "missing", "existing", "first", "latest", "none"], "description": "Monitoring strategy"},
+          "search_now": {"type": "boolean", "description": "Immediately search for music (default: true)"}
+        },
+        "required": ["name"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "lidarr.album_list",
+      "description": "List albums for an artist or all albums",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "artist": {"type": "string", "description": "Optional artist name filter"},
+          "monitored_only": {"type": "boolean", "description": "Only show monitored albums (default: false)"}
+        }
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "lidarr.search",
+      "description": "Search for missing or wanted music",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "artist": {"type": "string", "description": "Artist name (searches all missing if omitted)"},
+          "album": {"type": "string", "description": "Specific album title"}
+        }
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "lidarr.health",
+      "description": "Check Lidarr system health",
+      "parameters": {
+        "type": "object",
+        "properties": {}
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "prowlarr.indexer_list",
+      "description": "List all configured indexers in Prowlarr",
+      "parameters": {
+        "type": "object",
+        "properties": {}
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "prowlarr.indexer_test",
+      "description": "Test connectivity of indexers",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "indexer_name": {"type": "string", "description": "Specific indexer to test (omit for all)"}
+        }
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "prowlarr.search",
+      "description": "Search across all indexers for content",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "query": {"type": "string", "description": "Search query"},
+          "category": {"type": "string", "enum": ["movies", "tv", "music", "books", "other"], "description": "Search category"},
+          "indexer": {"type": "string", "description": "Optional specific indexer to search"}
+        },
+        "required": ["query"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "prowlarr.app_status",
+      "description": "Check status of connected applications (Sonarr, Radarr, Lidarr)",
+      "parameters": {
+        "type": "object",
+        "properties": {}
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "prowlarr.history",
+      "description": "View recent search and grab history",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "limit": {"type": "integer", "description": "Max results (default: 20)"}
+        }
+      }
+    }
+  }
+]
