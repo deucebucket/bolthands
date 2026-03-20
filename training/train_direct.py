@@ -60,7 +60,7 @@ def main():
         model,
         r=args.lora_r,
         lora_alpha=args.lora_alpha,
-        lora_dropout=0.05,
+        lora_dropout=0,  # Must be 0 for Unsloth fast kernel patching
         target_modules=[
             "q_proj", "k_proj", "v_proj", "o_proj",
             "gate_proj", "up_proj", "down_proj",
