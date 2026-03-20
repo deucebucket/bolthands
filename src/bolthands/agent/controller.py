@@ -12,6 +12,7 @@ import httpx
 
 from bolthands.agent.state import AgentState, AgentStatus
 from bolthands.config import BoltHandsConfig
+from bolthands.context import ContextMonitor, CompactionLevel, Compactor, WorkspaceMemory, SessionManager
 from bolthands.events.actions import FinishAction, ThinkAction
 from bolthands.llm import LLMClient, build_system_prompt, parse_response
 from bolthands.sandbox import SandboxContainer, SandboxExecutor
@@ -56,6 +57,10 @@ class AgentController:
         self._call_counter: int = 0
         self._sandbox_cleaned: bool = False
 
+        # Context management
+        self.monitor = ContextMonitor(max_context=config.max_output_length * 13)  # ~131K tokens
+        self.compactor = Compactor(llm_client=llm_client)
+
     async def run(self, task: str) -> AgentStatus:
         """Execute the main agent loop for the given task.
 
@@ -78,6 +83,14 @@ class AgentController:
                 self._sandbox,
                 max_output_length=self.config.max_output_length,
             )
+
+            # 1b. Set up workspace memory and check for session resume
+            workspace = WorkspaceMemory(self._executor)
+            session = SessionManager(workspace)
+            existing_state = await session.start_session()
+            if existing_state:
+                resume_prompt = session.build_resume_prompt(existing_state)
+                task = f"{resume_prompt}\n\nCurrent task: {task}"
 
             # 2. Build system prompt
             system_prompt = build_system_prompt(self.tool_registry.schemas())
@@ -103,7 +116,13 @@ class AgentController:
                     self.status.error_message = "Agent is stuck: repeating the same action"
                     break
 
-                # b. Call LLM
+                # b. Check context budget and compact if needed
+                level = self.monitor.check_budget(self._history)
+                if level != CompactionLevel.GREEN:
+                    self._emit_event("state_change", {"detail": f"Compacting context ({level.name})"})
+                    self._history = await self.compactor.compact(self._history, level)
+
+                # c. Call LLM
                 try:
                     response = await self.llm_client.chat(
                         self._history,
@@ -119,17 +138,17 @@ class AgentController:
                     self.status.error_message = str(exc)
                     break
 
-                # c. Parse response
+                # d. Parse response
                 action = parse_response(response)
 
-                # d. Plain text — no action
+                # e. Plain text — no action
                 if action is None:
                     content = response.get("content", "")
                     self._history.append({"role": "assistant", "content": content})
                     self.status.iteration += 1
                     continue
 
-                # e. FinishAction
+                # f. FinishAction
                 if isinstance(action, FinishAction):
                     self.status.state = AgentState.FINISHED
                     self.status.last_action_type = "finish"
@@ -137,7 +156,7 @@ class AgentController:
                     self.status.iteration += 1
                     break
 
-                # f. ThinkAction
+                # g. ThinkAction
                 if isinstance(action, ThinkAction):
                     self._call_counter += 1
                     call_id = f"call_{self._call_counter}"
@@ -163,7 +182,7 @@ class AgentController:
                     self.status.iteration += 1
                     continue
 
-                # g. Execute action via tool registry
+                # h. Execute action via tool registry
                 action_name = action.type
                 # Map action type to tool name
                 tool_name = _ACTION_TYPE_TO_TOOL.get(action_name, action_name)
@@ -173,13 +192,13 @@ class AgentController:
                     tool_name, args, self._executor
                 )
 
-                # h. Truncate observation output
+                # i. Truncate observation output
                 obs_data = observation.model_dump() if observation else {}
                 obs_json = json.dumps(obs_data)
                 if len(obs_json) > self.config.max_output_length:
                     obs_json = obs_json[: self.config.max_output_length] + "..."
 
-                # i. Append assistant message (with tool call) + tool response
+                # j. Append assistant message (with tool call) + tool response
                 self._call_counter += 1
                 call_id = f"call_{self._call_counter}"
                 thought_text = response.get("content", "") or ""
@@ -203,7 +222,7 @@ class AgentController:
 
                 self.status.last_action_type = action_name
 
-                # j. Emit event
+                # k. Emit event
                 self._emit_event("action", {
                     "tool": tool_name,
                     "args": args,
@@ -213,7 +232,7 @@ class AgentController:
                 # Truncate history if needed
                 self._truncate_history()
 
-                # k. Increment iteration
+                # l. Increment iteration
                 self.status.iteration += 1
 
             # 6. Max iterations exceeded
@@ -230,10 +249,19 @@ class AgentController:
             logger.exception("Agent loop failed: %s", exc)
 
         finally:
-            # 7. Clean up sandbox
+            # 7. Save session state (best-effort)
+            if self._executor:
+                try:
+                    workspace = WorkspaceMemory(self._executor)
+                    session = SessionManager(workspace)
+                    await session.end_session(self.status, f"Completed {self.status.iteration} iterations")
+                except Exception:
+                    pass  # best-effort
+
+            # 8. Clean up sandbox
             await self._cleanup_sandbox()
 
-        # 8. Return status
+        # 9. Return status
         return self.status
 
     async def cancel(self) -> None:
