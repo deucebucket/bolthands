@@ -132,14 +132,21 @@ _SANDBOX_PATCH_STOP = "bolthands.agent.controller.SandboxContainer.stop"
 _SANDBOX_PATCH_REMOVE = "bolthands.agent.controller.SandboxContainer.remove"
 
 
+_SESSION_PATCH_START = "bolthands.agent.controller.SessionManager.start_session"
+_SESSION_PATCH_END = "bolthands.agent.controller.SessionManager.end_session"
+_WORKSPACE_PATCH_INIT = "bolthands.agent.controller.WorkspaceMemory"
+
+
 @pytest.fixture
 def mock_sandbox():
-    """Patch all sandbox Docker methods to be no-ops."""
+    """Patch all sandbox Docker methods and session/workspace calls to be no-ops."""
     with (
         patch(_SANDBOX_PATCH_CREATE, new_callable=AsyncMock) as m_create,
         patch(_SANDBOX_PATCH_START, new_callable=AsyncMock) as m_start,
         patch(_SANDBOX_PATCH_STOP, new_callable=AsyncMock) as m_stop,
         patch(_SANDBOX_PATCH_REMOVE, new_callable=AsyncMock) as m_remove,
+        patch(_SESSION_PATCH_START, new_callable=AsyncMock, return_value=None),
+        patch(_SESSION_PATCH_END, new_callable=AsyncMock),
     ):
         yield {
             "create": m_create,
@@ -442,3 +449,56 @@ class TestAgentController:
         controller = _make_controller(config, llm, registry)
         # Should not raise
         uuid.UUID(controller.task_id)
+
+    @pytest.mark.asyncio
+    async def test_context_compaction(self, config, registry, mock_sandbox):
+        """When monitor returns YELLOW, compactor.compact is called."""
+        from bolthands.context.monitor import CompactionLevel
+
+        llm = MockLLMClient([_finish_response("Done")])
+        controller = _make_controller(config, llm, registry)
+
+        # Mock the monitor to return YELLOW so compaction triggers
+        controller.monitor.check_budget = MagicMock(return_value=CompactionLevel.YELLOW)
+        controller.compactor.compact = AsyncMock(side_effect=lambda msgs, level: msgs)
+
+        status = await controller.run("Test compaction")
+
+        assert status.state == AgentState.FINISHED
+        controller.monitor.check_budget.assert_called()
+        controller.compactor.compact.assert_called_once()
+        # Verify the level passed to compact was YELLOW
+        call_args = controller.compactor.compact.call_args
+        assert call_args[0][1] == CompactionLevel.YELLOW
+
+    @pytest.mark.asyncio
+    async def test_session_resume(self, config, registry, mock_sandbox):
+        """When workspace has existing state, resume prompt is prepended to task."""
+        llm = MockLLMClient([_finish_response("Done")])
+        controller = _make_controller(config, llm, registry)
+
+        saved_state = {"status": "finished", "summary": "Previous work"}
+
+        with (
+            patch(
+                "bolthands.agent.controller.SessionManager.start_session",
+                new_callable=AsyncMock,
+                return_value=saved_state,
+            ),
+            patch(
+                "bolthands.agent.controller.SessionManager.end_session",
+                new_callable=AsyncMock,
+            ),
+            patch(
+                "bolthands.agent.controller.SessionManager.build_resume_prompt",
+                return_value="Resuming from previous session.",
+            ) as mock_resume,
+        ):
+            status = await controller.run("Continue working")
+
+            assert status.state == AgentState.FINISHED
+            mock_resume.assert_called_once_with(saved_state)
+            # The user message should contain both resume prompt and original task
+            user_msg = controller._history[1]["content"]
+            assert "Resuming from previous session." in user_msg
+            assert "Continue working" in user_msg
