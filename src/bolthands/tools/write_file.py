@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import base64
+import shlex
 from typing import Any
 
 from bolthands.events.observations import FileWriteObservation
@@ -37,9 +39,9 @@ async def execute(args: dict[str, Any], executor: Any) -> FileWriteObservation:
     path = args["path"]
     content = args["content"]
 
-    # Use heredoc to write content, avoiding quoting issues
-    delimiter = "BOLTHANDS_EOF"
-    command = f"cat > {path!r} << '{delimiter}'\n{content}\n{delimiter}"
+    # Use base64 encoding to safely pass arbitrary content through the shell
+    encoded = base64.b64encode(content.encode()).decode()
+    command = f"echo '{encoded}' | base64 -d > {shlex.quote(path)}"
 
     stdout, stderr, exit_code = await executor.run(command, 30)
 

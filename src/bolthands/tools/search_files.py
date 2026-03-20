@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import shlex
 from typing import Any
 
 from bolthands.events.observations import SearchResultObservation
@@ -46,7 +47,7 @@ async def execute(
     path = args.get("path", ".")
     max_results = args.get("max_results", 20)
 
-    command = f"grep -rn {pattern!r} {path!r} | head -n {max_results}"
+    command = f"grep -rn {shlex.quote(pattern)} {shlex.quote(path)} | head -n {int(max_results)}"
     stdout, stderr, exit_code = await executor.run(command, 30)
 
     # grep returns exit_code 1 when no matches found — that's not an error

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import base64
 from unittest.mock import AsyncMock
 
 import pytest
@@ -36,6 +37,8 @@ def executor() -> AsyncMock:
 
 
 class TestRegistry:
+    pytestmark = pytest.mark.asyncio
+
     def test_contains_all_tools(self, registry: ToolRegistry) -> None:
         expected = [
             "execute_bash",
@@ -88,6 +91,8 @@ class TestSchemas:
 
 
 class TestBash:
+    pytestmark = pytest.mark.asyncio
+
     async def test_returns_cmd_output(self, registry: ToolRegistry, executor: AsyncMock) -> None:
         executor.run.return_value = ("hello\n", "", 0)
         result = await registry.execute("execute_bash", {"command": "echo hello"}, executor)
@@ -107,6 +112,8 @@ class TestBash:
 
 
 class TestReadFile:
+    pytestmark = pytest.mark.asyncio
+
     async def test_returns_file_content(self, registry: ToolRegistry, executor: AsyncMock) -> None:
         executor.run.return_value = ("file contents\n", "", 0)
         result = await registry.execute("read_file", {"path": "/tmp/test.txt"}, executor)
@@ -128,6 +135,8 @@ class TestReadFile:
 
 
 class TestWriteFile:
+    pytestmark = pytest.mark.asyncio
+
     async def test_returns_write_observation(self, registry: ToolRegistry, executor: AsyncMock) -> None:
         executor.run.return_value = ("", "", 0)
         result = await registry.execute(
@@ -148,6 +157,8 @@ class TestWriteFile:
 
 
 class TestEditFile:
+    pytestmark = pytest.mark.asyncio
+
     async def test_replaces_old_with_new(self, registry: ToolRegistry, executor: AsyncMock) -> None:
         # First call reads, second call writes
         executor.run.side_effect = [
@@ -162,9 +173,12 @@ class TestEditFile:
         assert isinstance(result, FileEditObservation)
         assert result.success is True
 
-        # Verify the written content contains the replacement
+        # Verify the written content contains the replacement (base64-encoded)
         write_cmd = executor.run.call_args_list[1][0][0]
-        assert "goodbye world" in write_cmd
+        # Extract base64-encoded content from command: echo '<b64>' | base64 -d > ...
+        b64_part = write_cmd.split("'")[1]
+        decoded = base64.b64decode(b64_part).decode()
+        assert "goodbye world" in decoded
 
     async def test_old_str_not_found(self, registry: ToolRegistry, executor: AsyncMock) -> None:
         executor.run.return_value = ("hello world\n", "", 0)
@@ -189,6 +203,8 @@ class TestEditFile:
 
 
 class TestSearchFiles:
+    pytestmark = pytest.mark.asyncio
+
     async def test_returns_matches(self, registry: ToolRegistry, executor: AsyncMock) -> None:
         executor.run.return_value = ("file.py:1:match1\nfile.py:5:match2\n", "", 0)
         result = await registry.execute(
@@ -209,6 +225,8 @@ class TestSearchFiles:
 
 
 class TestThink:
+    pytestmark = pytest.mark.asyncio
+
     async def test_returns_thought(self, registry: ToolRegistry, executor: AsyncMock) -> None:
         result = await registry.execute(
             "think", {"thought": "I need to check the logs"}, executor
@@ -222,6 +240,8 @@ class TestThink:
 
 
 class TestFinish:
+    pytestmark = pytest.mark.asyncio
+
     async def test_returns_none(self, registry: ToolRegistry, executor: AsyncMock) -> None:
         result = await registry.execute(
             "finish", {"message": "Task complete"}, executor
