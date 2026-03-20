@@ -27,6 +27,8 @@ src/bolthands/
     read_file.py         # read_file tool
     write_file.py        # write_file tool
     search_files.py      # search_files tool
+    edit_file.py         # edit_file tool (surgical str_replace edits)
+    think.py             # think tool (reasoning without execution)
     finish.py            # finish tool (signal completion)
   llm/
     client.py            # Async OpenAI-compatible client
@@ -47,9 +49,16 @@ FastAPI application with three endpoints:
 
 - POST /task: Submit a task. Body: {"task": "description", "sandbox_image": "python:3.12"}. Returns {"task_id": "uuid"}.
 - GET /task/{task_id}/status: Poll task status. Returns state, current step, iteration count.
+- DELETE /task/{task_id}: Cancel a running task. Stops the agent loop, kills the container, cleans up.
 - WebSocket /ws/{task_id}: Stream real-time events (actions, observations, state changes) as JSON.
 
-Server creates an AgentController per task, runs it in a background asyncio task, and streams events through the WebSocket.
+Server creates an AgentController per task, runs it in a background asyncio task, and streams events through the WebSocket. On shutdown, all running containers are stopped and removed.
+
+WebSocket event envelope:
+- type: "action" | "observation" | "state_change" | "error"
+- timestamp: ISO-8601
+- iteration: current step number
+- data: the action/observation/state payload
 
 ### 2. Agent Controller (agent/controller.py)
 
@@ -68,10 +77,23 @@ The core loop:
    h. Emit event to WebSocket
    i. Increment iteration counter
 
-Configuration:
-- max_iterations: 25 (default)
-- max_output_length: 10000 chars (truncate tool output to prevent context overflow)
-- stuck_threshold: 3 (same action repeated 3 times = stuck)
+Sandbox lifecycle: The controller creates the sandbox at task start (create + start) and tears it down at task end or error (stop + remove). The sandbox is owned by the controller.
+
+Configuration (from env vars or config file):
+- BOLTHANDS_LLM_URL: LLM server URL (default http://localhost:8080/v1)
+- BOLTHANDS_MAX_ITERATIONS: Max agent steps (default 25)
+- BOLTHANDS_MAX_OUTPUT_LENGTH: Truncate tool output chars (default 10000)
+- BOLTHANDS_STUCK_THRESHOLD: Same action repeated N times = stuck (default 3)
+- BOLTHANDS_SANDBOX_MEMORY: Container memory limit (default 4g)
+- BOLTHANDS_SANDBOX_IMAGE: Default container image (default python:3.12-slim)
+
+Stuck detection: "same action" means same tool name AND same arguments (JSON equality). When stuck is detected, agent transitions to ERROR state with message "Agent stuck: repeated {tool_name} {N} times".
+
+History management (minimal v1): Tool outputs truncated to max_output_length. If total message count exceeds 50, drop the oldest action+observation pairs (keeping system prompt and initial task). Full compaction pipeline is a separate spec.
+
+LLM error handling: On transient errors (timeout, 500, 502, 503), retry up to 3 times with 2/4/8 second backoff. On connection refused (server not running), transition to ERROR immediately. On malformed response (no valid tool call or text), inject "Your response was not valid. Please use a tool call." and retry once.
+
+Security note: Containers run with host networking so the agent can reach the LLM server. This means the agent can access other host services. Acceptable for single-user local setup. Future: bridge network with explicit port forwarding to LLM only.
 
 ### 3. Agent State (agent/state.py)
 
@@ -99,13 +121,10 @@ Container config:
 - Memory limit: configurable (default 4GB)
 - No GPU needed (only the LLM server uses GPU)
 
-executor.py: Run commands inside the container:
-- run(command, timeout=30): Run command, return stdout + stderr + exit code
-- read_file(path): Read file contents from container filesystem
-- write_file(path, content): Write file to container filesystem
-- search_files(pattern, path): Grep for pattern in files
+executor.py: Low-level Docker exec primitives. All methods are async (wrapped in asyncio.to_thread since docker SDK is sync):
+- run(command, timeout=30): Run command via docker exec_run, return stdout + stderr + exit code
 
-Uses docker SDK's exec_run under the hood. All commands run as non-root user inside the container.
+Tools use the executor for their underlying operations. The executor handles the raw Docker interaction; tools add schema, validation, and error handling on top.
 
 ### 5. Tools (tools/*.py)
 
@@ -123,6 +142,8 @@ Tools:
 - read_file: Read file. Args: path (str), max_lines (int, optional). Returns file content or error.
 - write_file: Write file. Args: path (str), content (str). Returns success/error.
 - search_files: Search files. Args: pattern (str), path (str, default "."), max_results (int, default 20). Returns matching lines with file:line format.
+- edit_file: Surgical file edit. Args: path (str), old_str (str), new_str (str). Replaces exact match of old_str with new_str. Returns success/error. Avoids full-file rewrites for large files.
+- think: Internal reasoning. Args: thought (str). Not executed — just logged. Lets the agent reason step-by-step without triggering an action.
 - finish: Signal completion. Args: message (str). Stops the agent loop.
 
 ### 6. LLM Client (llm/client.py)
@@ -158,7 +179,9 @@ Actions:
 - CmdRunAction(command, timeout)
 - FileReadAction(path, max_lines)
 - FileWriteAction(path, content)
+- FileEditAction(path, old_str, new_str)
 - SearchFilesAction(pattern, path)
+- ThinkAction(thought)
 - FinishAction(message)
 
 Observations:
@@ -166,6 +189,8 @@ Observations:
 - FileContentObservation(path, content, exists)
 - FileWriteObservation(path, success, error)
 - SearchResultObservation(matches, total_count)
+- FileEditObservation(path, success, error)
+- ThinkObservation(thought)
 - ErrorObservation(error_type, message)
 
 ### 10. CLI (cli/main.py)
