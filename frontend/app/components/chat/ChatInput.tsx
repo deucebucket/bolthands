@@ -1,4 +1,4 @@
-import { useCallback, useRef, type KeyboardEvent, type ChangeEvent } from "react";
+import { useCallback, useEffect, useRef, type KeyboardEvent, type ChangeEvent } from "react";
 import { useStore } from "@nanostores/react";
 import { $inputValue, $isSubmitting, addUserMessage } from "../../stores/chat";
 import { $taskId, $agentState, setAgentState } from "../../stores/agent";
@@ -13,6 +13,15 @@ export default function ChatInput() {
   const isSubmitting = useStore($isSubmitting);
   const agentState = useStore($agentState);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const wsRef = useRef<AgentWebSocket | null>(null);
+
+  // Cleanup WebSocket on unmount
+  useEffect(() => {
+    return () => {
+      wsRef.current?.disconnect();
+      wsRef.current = null;
+    };
+  }, []);
 
   const disabled = isSubmitting || agentState === "running";
 
@@ -50,10 +59,27 @@ export default function ChatInput() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ task: value }),
       });
+
+      if (!res.ok) {
+        const errorText = await res.text();
+        setAgentState("error", `Task submission failed: ${errorText}`);
+        $isSubmitting.set(false);
+        return;
+      }
+
       const data = await res.json();
       const taskId = data.task_id as string;
+      if (!taskId) {
+        setAgentState("error", "Server returned no task_id");
+        $isSubmitting.set(false);
+        return;
+      }
+
       $taskId.set(taskId);
       setAgentState("running");
+
+      // Disconnect previous WebSocket before creating a new one
+      if (wsRef.current) wsRef.current.disconnect();
 
       const ws = new AgentWebSocket(taskId);
       ws.onEvent = handleAgentEvent;
@@ -61,6 +87,7 @@ export default function ChatInput() {
         $isSubmitting.set(false);
       };
       ws.connect();
+      wsRef.current = ws;
     } catch (err) {
       console.error("Failed to submit task:", err);
       setAgentState("error", "Failed to submit task");

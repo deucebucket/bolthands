@@ -51,12 +51,19 @@ export function addAction(tool: string, args: Record<string, unknown>) {
 
 export function updateLastActionStatus(status: "done" | "error", output?: string, error?: string) {
   const messages = [...$messages.get()];
-  const lastMsg = messages[messages.length - 1];
-  if (lastMsg?.actions?.length) {
-    const lastAction = lastMsg.actions[lastMsg.actions.length - 1];
-    lastAction.status = status;
-    if (output) lastAction.output = output;
-    if (error) lastAction.error = error;
+  const lastIdx = messages.length - 1;
+  if (lastIdx < 0) return;
+  const lastMsg = { ...messages[lastIdx] };
+  if (lastMsg.actions?.length) {
+    lastMsg.actions = [...lastMsg.actions];
+    const actionIdx = lastMsg.actions.length - 1;
+    lastMsg.actions[actionIdx] = {
+      ...lastMsg.actions[actionIdx],
+      status,
+      ...(output !== undefined && { output }),
+      ...(error !== undefined && { error }),
+    };
   }
+  messages[lastIdx] = lastMsg;
   $messages.set(messages);
 }

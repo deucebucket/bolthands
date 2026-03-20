@@ -16,6 +16,7 @@ export function editFile(path: string, oldStr: string, newStr: string) {
   const map = { ...$fileMap.get() };
   const file = map[path];
   if (file) {
+    // Intentionally replaces only the first occurrence (matches backend edit_file / str_replace behavior)
     map[path] = { ...file, content: file.content.replace(oldStr, newStr), lastModified: new Date().toISOString() };
     $fileMap.set(map);
   }
