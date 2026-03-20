@@ -16,8 +16,14 @@ export function resetAgent() {
   $errorMessage.set(null);
 }
 
+const MAX_EVENTS = 500;
+
 export function addEvent(event: AgentEvent) {
-  $events.set([...$events.get(), event]);
+  const events = $events.get();
+  const updated = events.length >= MAX_EVENTS
+    ? [...events.slice(-MAX_EVENTS + 1), event]
+    : [...events, event];
+  $events.set(updated);
   $iteration.set(event.iteration);
 }
 

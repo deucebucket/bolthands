@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import base64
+import shlex
 from typing import Any
 
 from bolthands.events.observations import FileEditObservation
@@ -43,7 +45,7 @@ async def execute(args: dict[str, Any], executor: Any) -> FileEditObservation:
     new_str = args["new_str"]
 
     # Read the file
-    stdout, stderr, exit_code = await executor.run(f"cat {path!r}", 30)
+    stdout, stderr, exit_code = await executor.run(f"cat {shlex.quote(path)}", 30)
 
     if exit_code != 0:
         return FileEditObservation(
@@ -63,9 +65,9 @@ async def execute(args: dict[str, Any], executor: Any) -> FileEditObservation:
     # Replace first occurrence
     new_content = content.replace(old_str, new_str, 1)
 
-    # Write back using heredoc
-    delimiter = "BOLTHANDS_EOF"
-    write_cmd = f"cat > {path!r} << '{delimiter}'\n{new_content}\n{delimiter}"
+    # Write back using base64 encoding to safely pass arbitrary content
+    encoded = base64.b64encode(new_content.encode()).decode()
+    write_cmd = f"echo '{encoded}' | base64 -d > {shlex.quote(path)}"
     stdout, stderr, exit_code = await executor.run(write_cmd, 30)
 
     if exit_code != 0:

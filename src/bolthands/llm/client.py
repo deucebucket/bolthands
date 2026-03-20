@@ -23,6 +23,7 @@ class LLMClient:
         self.base_url = base_url.rstrip("/")
         self.timeout = timeout
         self.max_retries = max_retries
+        self.client = httpx.AsyncClient(timeout=httpx.Timeout(timeout))
 
     async def chat(
         self,
@@ -60,16 +61,13 @@ class LLMClient:
 
         for attempt in range(self.max_retries):
             try:
-                async with httpx.AsyncClient(
-                    timeout=httpx.Timeout(self.timeout)
-                ) as client:
-                    response = await client.post(
-                        f"{self.base_url}/chat/completions",
-                        json=payload,
-                    )
-                    response.raise_for_status()
-                    data = response.json()
-                    return data["choices"][0]["message"]
+                response = await self.client.post(
+                    f"{self.base_url}/chat/completions",
+                    json=payload,
+                )
+                response.raise_for_status()
+                data = response.json()
+                return data["choices"][0]["message"]
 
             except httpx.ConnectError:
                 # Server unreachable — don't retry
@@ -96,3 +94,7 @@ class LLMClient:
 
         # All retries exhausted
         raise last_exception  # type: ignore[misc]
+
+    async def close(self) -> None:
+        """Close the underlying HTTP client and release connections."""
+        await self.client.aclose()

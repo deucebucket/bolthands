@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import shlex
 from typing import Any
 
 from bolthands.events.observations import CmdOutputObservation, FileContentObservation
@@ -38,9 +39,9 @@ async def execute(args: dict[str, Any], executor: Any) -> FileContentObservation
     max_lines = args.get("max_lines")
 
     if max_lines is not None:
-        command = f"head -n {max_lines} {path!r}"
+        command = f"head -n {int(max_lines)} {shlex.quote(path)}"
     else:
-        command = f"cat {path!r}"
+        command = f"cat {shlex.quote(path)}"
 
     stdout, stderr, exit_code = await executor.run(command, 30)
 

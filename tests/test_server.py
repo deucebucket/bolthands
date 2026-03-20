@@ -96,16 +96,17 @@ class TestCreateTask:
     def test_create_task_stores_in_active_tasks(
         self, mock_controller_cls, mock_llm_cls, mock_registry, client
     ):
-        """POST /task stores the controller and background task."""
+        """POST /task starts background task (auto-cleaned on completion)."""
         controller = _mock_controller()
         mock_controller_cls.return_value = controller
 
         response = client.post("/task", json={"task": "hello"})
         task_id = response.json()["task_id"]
 
-        assert task_id in active_tasks
-        stored_controller, stored_task = active_tasks[task_id]
-        assert stored_controller is controller
+        # Task completes inline in TestClient, so it may already be cleaned up.
+        # Just verify the POST succeeded with the right task_id.
+        assert response.status_code == 200
+        assert task_id == controller.task_id
 
 
 # ---------------------------------------------------------------------------

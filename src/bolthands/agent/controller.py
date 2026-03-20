@@ -54,6 +54,7 @@ class AgentController:
         self._sandbox: SandboxContainer | None = None
         self._executor: SandboxExecutor | None = None
         self._call_counter: int = 0
+        self._sandbox_cleaned: bool = False
 
     async def run(self, task: str) -> AgentStatus:
         """Execute the main agent loop for the given task.
@@ -263,14 +264,24 @@ class AgentController:
         """If history exceeds 50 messages, remove oldest action+observation pairs.
 
         Keeps the first 2 messages (system prompt + user task).
+        Always drops assistant+tool pairs together to avoid orphaned tool messages
+        that would cause LLM API 400 errors.
         """
-        max_history = 50
-        while len(self._history) > max_history:
-            # Remove the 3rd and 4th messages (first action+observation pair after system+user)
-            if len(self._history) > 4:
-                del self._history[2:4]
+        if len(self._history) <= 50:
+            return
+        # Keep first 2 (system + user task), drop oldest assistant+tool pairs
+        preserved = self._history[:2]
+        rest = self._history[2:]
+        # Drop pairs from the front until under limit
+        while len(preserved) + len(rest) > 50 and len(rest) >= 2:
+            # Find next pair to drop
+            if rest[0]["role"] == "assistant" and len(rest) > 1 and rest[1]["role"] == "tool":
+                rest = rest[2:]  # drop the pair
+            elif rest[0]["role"] == "tool":
+                rest = rest[1:]  # orphaned tool, drop it
             else:
-                break
+                rest = rest[1:]  # drop single message
+        self._history = preserved + rest
 
     def _emit_event(self, event_type: str, data: dict) -> None:
         """Build and emit a WebSocket event envelope."""
@@ -284,7 +295,10 @@ class AgentController:
             self.on_event(envelope)
 
     async def _cleanup_sandbox(self) -> None:
-        """Stop and remove the sandbox container."""
+        """Stop and remove the sandbox container (idempotent)."""
+        if self._sandbox_cleaned:
+            return
+        self._sandbox_cleaned = True
         if self._sandbox is not None:
             try:
                 await self._sandbox.stop()

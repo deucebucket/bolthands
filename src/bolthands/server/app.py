@@ -108,7 +108,15 @@ async def create_task(request: TaskRequest) -> TaskResponse:
     # Store queue on controller for WebSocket access
     controller._event_queue = queue  # type: ignore[attr-defined]
 
-    bg_task = asyncio.create_task(controller.run(request.task))
+    async def _run_and_cleanup(task_id: str, ctrl: AgentController, task_text: str):
+        try:
+            await ctrl.run(task_text)
+        finally:
+            active_tasks.pop(task_id, None)
+
+    bg_task = asyncio.create_task(
+        _run_and_cleanup(controller.task_id, controller, request.task)
+    )
     active_tasks[controller.task_id] = (controller, bg_task)
 
     return TaskResponse(task_id=controller.task_id)
